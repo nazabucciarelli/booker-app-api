@@ -17,5 +17,6 @@ public class CustomerInfoDTO {
     private String username;
     private String password;
     private String email;
+    private String roleName;
     private Long businessId;
 }

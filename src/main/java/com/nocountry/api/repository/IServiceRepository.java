@@ -17,4 +17,8 @@ public interface IServiceRepository extends JpaRepository<Service, Long> {
     Long countByBusinessId(Long id);
 
     List<Service> findAllByBusinessId(Long id);
+
+    List<Service> findServiceByEmployeesId(Long employeeId);
+
+    List<Service> findServiceByEmployeesIdAndBusinessId(Long employeeId, Long businessId);
 }

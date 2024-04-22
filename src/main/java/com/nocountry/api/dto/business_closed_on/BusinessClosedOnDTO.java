@@ -1,5 +1,6 @@
 package com.nocountry.api.dto.business_closed_on;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,10 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class BusinessClosedOnDTO {
     private Long id;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate date;
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime fromHour;
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime toHour;
 }

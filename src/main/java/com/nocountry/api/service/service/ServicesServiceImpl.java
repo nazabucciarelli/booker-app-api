@@ -29,25 +29,17 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public List<SimpleServiceDTO> listByBusinessIdPaginated(Long id, int page, int size) {
-        List<Service> services = serviceRepository.findAllByBusinessId(id);
-
-        if (services.isEmpty())
-            return null;
-
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Service> servicesPage = serviceRepository.findAllByBusinessId(id, pageable);
-
-            if (!servicesPage.isEmpty()) {
-                return servicesPage.stream().
-                        map(service -> modelMapper.map(service, SimpleServiceDTO.class)).
-                        collect(Collectors.toList());
-            }
-        } catch (ResourceNotFoundException rnf) {
-            throw new ResourceNotFoundException(rnf.getMessage());
+        Pageable pageable = PageRequest.of(page, size);
+        if (!businessRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Business with ID " + id + " not found");
         }
-
-        return null;
+        Page<Service> servicesPage = serviceRepository.findAllByBusinessId(id, pageable);
+        if (!servicesPage.isEmpty()) {
+            return servicesPage.stream().
+                    map(service -> modelMapper.map(service, SimpleServiceDTO.class)).
+                    collect(Collectors.toList());
+        }
+        throw new ResourceNotFoundException("Business ID " + id + " has no services yet");
     }
 
     @Override
@@ -58,7 +50,7 @@ public class ServicesServiceImpl implements ServicesService {
         }
         Service service = new Service(optionalBusiness.get(), serviceInfoDTO.getName(), serviceInfoDTO.getDescription(),
                 serviceInfoDTO.getPrice(), serviceInfoDTO.getDurationMinutes());
-        return modelMapper.map(serviceRepository.save(service),SimpleServiceDTO.class);
+        return modelMapper.map(serviceRepository.save(service), SimpleServiceDTO.class);
     }
 
     @Override
@@ -68,5 +60,21 @@ public class ServicesServiceImpl implements ServicesService {
             throw new ResourceNotFoundException("Service with ID " + id + " does not exist");
         }
         return modelMapper.map(optionalService.get(), ServiceDTO.class);
+    }
+
+    public List<ServiceDTO> getServicesByEmployeeId(Long id) {
+        try {
+            List<Service> listServices = serviceRepository.findServiceByEmployeesId(id);
+
+            if (!listServices.isEmpty()) {
+                return listServices.stream().
+                        map(service -> modelMapper.map(service, ServiceDTO.class)).
+                        collect(Collectors.toList());
+            }
+        } catch (ResourceNotFoundException rnf) {
+            throw new ResourceNotFoundException("No services founded by employee");
+        }
+
+        return null;
     }
 }

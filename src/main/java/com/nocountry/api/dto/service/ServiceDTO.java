@@ -1,5 +1,6 @@
 package com.nocountry.api.dto.service;
 
+import com.nocountry.api.dto.employee.SimpleEmployeeDTO;
 import com.nocountry.api.model.Business;
 import com.nocountry.api.model.Employee;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,5 @@ public class ServiceDTO {
     private String description;
     private Double price;
     private Integer durationMinutes;
-    private List<Employee> employees;
+    private List<SimpleEmployeeDTO> employees;
 }

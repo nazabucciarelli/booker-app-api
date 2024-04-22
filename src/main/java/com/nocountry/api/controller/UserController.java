@@ -21,7 +21,7 @@ public class UserController {
      * @param userLoginDTO DTO with user information like username, password and business_id
      * @return UserDTO which is an entity like User but with less information
      */
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     @Transactional
     public ResponseEntity<UserDTO> login(@RequestBody UserLoginDTO userLoginDTO) {
         return new ResponseEntity<UserDTO>(userService.login(userLoginDTO), HttpStatus.OK);

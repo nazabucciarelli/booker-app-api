@@ -1,5 +1,6 @@
 package com.nocountry.api.dto.business_schedule;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,9 @@ public class BusinessScheduleInfoDTO {
     @NotBlank
     private Long businessId;
     @NotBlank
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime fromHour;
     @NotBlank
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime toHour;
 }

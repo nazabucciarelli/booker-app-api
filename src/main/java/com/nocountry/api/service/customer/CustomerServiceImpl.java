@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerServiceImpl implements CustomerService{
 
     @Autowired
     ICustomerRepository customerRepository;
@@ -36,9 +36,9 @@ public class CustomerServiceImpl implements CustomerService {
     private ModelMapper modelMapper;
 
     public CustomerDTO registerCustomer(CustomerInfoDTO customerInfo) {
-        if (userRepository.existsByEmail(customerInfo.getEmail())) {
+        if(userRepository.existsByEmail(customerInfo.getEmail())){
             throw new RegisterException("Customer with email " + customerInfo.getEmail() + " already exists");
-        } else if (userRepository.existsByUsername(customerInfo.getUsername())) {
+        } else if(userRepository.existsByUsername(customerInfo.getUsername())){
             throw new RegisterException("Customer with username " + customerInfo.getUsername() + " already exists");
         }
         Optional<Role> optionalRole = roleRepository.findByName("USER");
@@ -51,11 +51,12 @@ public class CustomerServiceImpl implements CustomerService {
             User user = new User(customerInfo.getUsername(), customerInfo.getPassword(), customerInfo.getEmail(), role,
                     optionalBusiness.get());
             userRepository.save(user);
+
             Customer customer = new Customer(user, customerInfo.getFirstName(), customerInfo.getLastName(), customerInfo.getPhone());
             customer = customerRepository.save(customer);
             return modelMapper.map(customer, CustomerDTO.class);
         } else {
-            throw new ResourceNotFoundException("Role USER is not created in the database yet");
+            throw new ResourceNotFoundException("Role with name " + customerInfo.getRoleName() + " not found");
         }
     }
 
@@ -77,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getCustomerById(Long id) {
-        try {
+        try{
             Optional<Customer> customer = customerRepository.findById(id);
 
             if (customer.isPresent())
@@ -92,14 +93,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO findCustomerByUserId(Long userId) {
         Optional<Customer> optionalCustomer = customerRepository.findCustomerByUserId(userId);
-        if (optionalCustomer.isEmpty()) {
+        if (optionalCustomer.isEmpty()){
             throw new ResourceNotFoundException("Customer with User ID " + userId + " not found");
         }
         return modelMapper.map(optionalCustomer.get(), CustomerDTO.class);
     }
 
     private Customer getCustomerByEmail(String email) {
-        try {
+        try{
             Customer customer = customerRepository.findCustomerByEmail(email);
 
             if (customer != null)
@@ -112,7 +113,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Customer getCustomerByUsername(String username) {
-        try {
+        try{
             Customer customer = customerRepository.findCustomerByUsername(username);
 
             if (customer != null)

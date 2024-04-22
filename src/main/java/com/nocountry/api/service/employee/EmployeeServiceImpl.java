@@ -5,6 +5,7 @@ import com.nocountry.api.dto.employee.EmployeeInfoDTO;
 import com.nocountry.api.dto.employee.SimpleEmployeeDTO;
 import com.nocountry.api.exception.ResourceNotFoundException;
 import com.nocountry.api.model.Employee;
+import com.nocountry.api.repository.IBusinessRepository;
 import com.nocountry.api.repository.IEmployeeRepository;
 import com.nocountry.api.repository.IServiceRepository;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,10 +29,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private IServiceRepository serviceRepository;
     @Autowired
+    private IBusinessRepository businessRepository;
+    @Autowired
     private ModelMapper modelMapper;
 
     /**
      * Allows to create an employee
+     *
      * @param employeeInfoDTO EmployeeInfoDTO with the information of the employee to save
      * @return EmployeeDTO entity
      */
@@ -53,6 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * Allows to get information about an employee by its id
+     *
      * @param id ID of the employee
      * @return EmployeeDTO entity
      */
@@ -67,37 +73,43 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * Allows to list all the employees by a business ID
-     * @param id ID of the business
+     *
+     * @param id   ID of the business
      * @param page Number of page
      * @param size Size of page
      * @return List of SimpleEmployeeDTO entity
      */
     @Override
     public List<SimpleEmployeeDTO> listEmployeesByBusinessIdPaginated(Long id, int page, int size) {
+        if (!businessRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Business with id " + id + " not found");
+        }
         Pageable pageable = PageRequest.of(page, size);
-        Page<Employee> employeesPage = employeeRepository.findByServices_Business_Id(id, pageable);
+        Page<Employee> employeesPage = employeeRepository.findByBusinessId(id, pageable);
         if (employeesPage.isEmpty()) {
-            throw new ResourceNotFoundException("No employees found on business with ID " + id);
+            return Collections.emptyList();
         }
         return employeesPage.stream().
                 map(employee -> modelMapper.map(employee, SimpleEmployeeDTO.class)).
                 collect(Collectors.toList());
     }
 
-    /* @Override       pendiente por revisar esto
-    public List<EmployeeDTO> listEmployeesByService(Long id) {
-        List<Employee> employees = employeeRepository.findEmployeesByServiceId(id);
+    @Override
+    public EmployeeDTO getEmployeeServices(Long employeeId, Long businessId) {
+        Employee employee = null;
+        Optional<Employee> employeeOpt = employeeRepository.findById(employeeId);
 
-        if (employees.isEmpty()) {
-            throw new ResourceNotFoundException("No employees found");
+        if (employeeOpt.isPresent()) {
+            employee = employeeOpt.get();
+
+            List<com.nocountry.api.model.Service> listServices = serviceRepository.findServiceByEmployeesIdAndBusinessId(employee.getId(), businessId);
+
+            if (!listServices.isEmpty())
+                employee.setServices(listServices);
         }
 
-        List<EmployeeDTO> listEmployees = employees.stream().
-                map(employee -> modelMapper.map(employee, EmployeeDTO.class)).
-                collect(Collectors.toList());
-
-        return listEmployees;
-    } */
+        return modelMapper.map(employee, EmployeeDTO.class);
+    }
 
     /**
      * List all employees by business id for employees page
