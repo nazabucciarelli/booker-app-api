@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class BusinessScheduleController {
      * @param businessScheduleInfoDTO BusinessScheduleDTO entity
      * @return BusinessScheduleInfoDTO datatype which contains only the necessary information about the business schedule.
      */
-    @PostMapping("/business_schedule")
+    @PostMapping("/admin/business_schedule")
     @Transactional
     public ResponseEntity<BusinessScheduleDTO> create(@RequestBody BusinessScheduleInfoDTO businessScheduleInfoDTO) {
         BusinessScheduleDTO businessScheduleDTO = businessScheduleService.create(businessScheduleInfoDTO);
@@ -38,7 +39,7 @@ public class BusinessScheduleController {
      * @return List of BusinessScheduleInfoDTO datatype which contains only the necessary information about the
      * business schedule.
      */
-    @GetMapping("/business_schedule/{business_id}")
+    @GetMapping("/admin/business_schedule/{business_id}")
     public ResponseEntity<List<BusinessScheduleDTO>> listAllByBusinessId(@PathVariable("business_id") Long businessId) {
         List<BusinessScheduleDTO> businessScheduleDTOList = businessScheduleService.listAllByBusinessId(businessId);
         return new ResponseEntity<List<BusinessScheduleDTO>>(businessScheduleDTOList, HttpStatus.OK);
@@ -50,7 +51,7 @@ public class BusinessScheduleController {
      * @param businessId ID of the business
      * @return No Content (204) HTTP status
      */
-    @DeleteMapping("/business_schedule/{business_id}")
+    @DeleteMapping("/admin/business_schedule/{business_id}")
     @Transactional
     public ResponseEntity delete(@PathVariable("business_id") Long businessId) {
         businessScheduleService.deleteById(businessId);

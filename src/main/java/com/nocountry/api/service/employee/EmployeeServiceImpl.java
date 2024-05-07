@@ -26,16 +26,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private IEmployeeRepository employeeRepository;
+
     @Autowired
     private IServiceRepository serviceRepository;
+
     @Autowired
     private IBusinessRepository businessRepository;
+
     @Autowired
     private ModelMapper modelMapper;
 
     /**
      * Allows to create an employee
-     *
      * @param employeeInfoDTO EmployeeInfoDTO with the information of the employee to save
      * @return EmployeeDTO entity
      */
@@ -52,13 +54,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 })
                 .toList();
         Employee employee = new Employee(employeeInfoDTO.getFirstName(), employeeInfoDTO.getLastName()
-                , employeeInfoDTO.getProfession(), employeeInfoDTO.getPicture(), services, employeeInfoDTO.getWorkingDays());
+                , employeeInfoDTO.getProfession(), employeeInfoDTO.getPicture(), services, employeeInfoDTO
+                .getWorkingDays());
         return modelMapper.map(employeeRepository.save(employee), EmployeeDTO.class);
     }
 
     /**
      * Allows to get information about an employee by its id
-     *
      * @param id ID of the employee
      * @return EmployeeDTO entity
      */
@@ -102,34 +104,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeOpt.isPresent()) {
             employee = employeeOpt.get();
 
-            List<com.nocountry.api.model.Service> listServices = serviceRepository.findServiceByEmployeesIdAndBusinessId(employee.getId(), businessId);
+            List<com.nocountry.api.model.Service> listServices = serviceRepository
+                    .findServiceByEmployeesIdAndBusinessId(employee.getId(), businessId);
 
             if (!listServices.isEmpty())
-                employee.setServices(listServices);
+               employee.setServices(listServices);
         }
 
         return modelMapper.map(employee, EmployeeDTO.class);
     }
-
-    /**
-     * List all employees by business id for employees page
-     *
-     * @param id
-     * @return
-     */
-    /*  pendiente por revisar esto
-    public List<EmployeeDTO> listEmployeesByBusinessId(Long id) {
-        List<Employee> employees = employeeRepository.findEmployeesByBusinessId(id);
-
-        if (employees.isEmpty()) {
-            throw new ResourceNotFoundException("No employees found");
-        }
-
-        List<EmployeeDTO> listEmployees = employees.stream().
-                map(employee -> modelMapper.map(employee, EmployeeDTO.class)).
-                collect(Collectors.toList());
-
-        return listEmployees;
-    }*/
 
 }

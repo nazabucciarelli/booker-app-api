@@ -1,7 +1,8 @@
 package com.nocountry.api.service.business;
 
-import com.nocountry.api.dto.business_schedule.BusinessScheduleInfoDTO;
 import com.nocountry.api.dto.business_schedule.BusinessScheduleDTO;
+import com.nocountry.api.dto.business_schedule.BusinessScheduleInfoDTO;
+import com.nocountry.api.exception.BusinessSchedulesLimitException;
 import com.nocountry.api.exception.NotValidDatetimeException;
 import com.nocountry.api.exception.ResourceNotFoundException;
 import com.nocountry.api.model.Business;
@@ -12,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,11 +33,28 @@ public class BusinessScheduleServiceImpl implements BusinessScheduleService {
     public BusinessScheduleDTO create(BusinessScheduleInfoDTO businessScheduleInfoDTO) {
         Optional<Business> optionalBusiness = businessRepository.findById(businessScheduleInfoDTO.getBusinessId());
         if (optionalBusiness.isEmpty()) {
-            throw new ResourceNotFoundException("Business with ID " + businessScheduleInfoDTO.getBusinessId() + " not found");
+            throw new ResourceNotFoundException("Business with ID " + businessScheduleInfoDTO.getBusinessId() +
+                    " not found");
         } else if (businessScheduleInfoDTO.getFromHour().isAfter(businessScheduleInfoDTO.getToHour())) {
             throw new NotValidDatetimeException("The fromHour value must be before of the toHour value");
         }
-        BusinessSchedule businessSchedule = new BusinessSchedule(optionalBusiness.get(), businessScheduleInfoDTO.getFromHour(), businessScheduleInfoDTO.getToHour());
+
+        List<BusinessSchedule> businessSchedules = businessScheduleRepository
+                .findByBusinessId(businessScheduleInfoDTO.getBusinessId());
+        if(businessSchedules.size() == 3){
+            throw new BusinessSchedulesLimitException("You have reached the limit of schedules for the business");
+        }
+        for (BusinessSchedule bs : businessSchedules) {
+            LocalTime fromHour = businessScheduleInfoDTO.getFromHour();
+            LocalTime toHour = businessScheduleInfoDTO.getToHour();
+            if ((fromHour.isAfter(bs.getFromHour()) && fromHour.isBefore(bs.getToHour())) ||
+                    (toHour.isAfter(bs.getFromHour()) && toHour.isBefore(bs.getToHour()))) {
+                throw new NotValidDatetimeException("The fromHour or toHour values collide with an existent schedule");
+            }
+        }
+
+        BusinessSchedule businessSchedule = new BusinessSchedule(optionalBusiness.get(),
+                businessScheduleInfoDTO.getFromHour(), businessScheduleInfoDTO.getToHour());
         businessScheduleRepository.save(businessSchedule);
         return modelMapper.map(businessSchedule, BusinessScheduleDTO.class);
     }
@@ -49,7 +68,8 @@ public class BusinessScheduleServiceImpl implements BusinessScheduleService {
         return businessScheduleList.stream()
                 .map(businessSchedule -> modelMapper.map(businessSchedule, BusinessScheduleDTO.class))
                 .sorted((o1, o2) ->
-                        o1.getFromHour().isAfter(o2.getFromHour()) ? 1 : o1.getFromHour().equals(o2.getFromHour()) ? 0 : -1)
+                        o1.getFromHour().isAfter(o2.getFromHour()) ? 1 :
+                                o1.getFromHour().equals(o2.getFromHour()) ? 0 : -1)
                 .toList();
     }
 

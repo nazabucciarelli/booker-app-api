@@ -1,5 +1,6 @@
 package com.nocountry.api.controller;
 
+import com.nocountry.api.dto.auth.AuthenticationDTO;
 import com.nocountry.api.dto.customer.CustomerDTO;
 import com.nocountry.api.dto.customer.CustomerInfoDTO;
 import com.nocountry.api.service.customer.CustomerService;
@@ -27,8 +28,9 @@ public class CustomerController {
     @PostMapping
     @Transactional
     @RequestMapping("/customer/register")
-    public ResponseEntity<CustomerDTO> registerCustomer(@RequestBody CustomerInfoDTO customerInfo) {
-        return new ResponseEntity<CustomerDTO>(customerServiceImpl.registerCustomer(customerInfo), HttpStatus.CREATED);
+    public ResponseEntity<AuthenticationDTO> registerCustomer(@RequestBody CustomerInfoDTO customerInfo) {
+        return new ResponseEntity<AuthenticationDTO>(customerServiceImpl.registerCustomer(customerInfo),
+                HttpStatus.CREATED);
     }
 
     /**

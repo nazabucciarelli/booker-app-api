@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class BusinessClosedOnController {
      * @return BusinessClosedOnInfoDTO which is a simplified entity of BusinessClosedOn and contains only necessary
      * information
      */
-    @PostMapping("/business_closed_on")
+    @PostMapping("/admin/business_closed_on")
     @Transactional
     public ResponseEntity<BusinessClosedOnDTO> create(@RequestBody BusinessClosedOnInfoDTO businessClosedOnInfoDTO) {
         BusinessClosedOnDTO businessClosedOnDTO = businessClosedOnService.create(businessClosedOnInfoDTO);
@@ -51,7 +52,7 @@ public class BusinessClosedOnController {
      * @param id ID of the BusinessClosedOn entity
      * @return No Content (204) HTTP status
      */
-    @DeleteMapping("/business_closed_on/{business_closed_on_id}")
+    @DeleteMapping("/admin/business_closed_on/{business_closed_on_id}")
     public ResponseEntity delete(@PathVariable("business_closed_on_id") Long id) {
         businessClosedOnService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

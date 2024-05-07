@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "businesses")
-public class Business {
+public class Business implements Workable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

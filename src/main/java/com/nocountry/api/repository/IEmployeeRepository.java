@@ -25,4 +25,11 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Long> {
             nativeQuery = true)
     Page<Employee> findByBusinessId(Long businessId, Pageable pageable);
 
+    @Query(value = "SELECT distinct e " +
+            "FROM Employee e " +
+            "JOIN EmployeesServices es ON e.id = es.employees_id " +
+            "JOIN Service s ON es.services_id = s.id " +
+            "WHERE s.id = :id ",
+            nativeQuery = true)
+    List<Employee> findEmployeesByServiceId(Long id);
 }

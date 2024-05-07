@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +34,8 @@ public class ServiceController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size
     ) {
-        return new ResponseEntity<List<SimpleServiceDTO>>(servicesService.listByBusinessIdPaginated(businessId, page, size),
-                HttpStatus.OK);
+        return new ResponseEntity<List<SimpleServiceDTO>>(servicesService.listByBusinessIdPaginated(businessId, page,
+                size), HttpStatus.OK);
     }
 
     /**
@@ -43,7 +44,7 @@ public class ServiceController {
      * @param serviceInfoDTO ServiceInfoDTO
      * @return ServiceDTO entity
      */
-    @PostMapping("/services")
+    @PostMapping("/admin/services")
     @Transactional
     public ResponseEntity<SimpleServiceDTO> createService(@RequestBody ServiceInfoDTO serviceInfoDTO) {
         return new ResponseEntity<SimpleServiceDTO>(servicesService.create(serviceInfoDTO), HttpStatus.CREATED);

@@ -3,13 +3,14 @@ package com.nocountry.api.controller;
 import com.nocountry.api.dto.employee.EmployeeDTO;
 import com.nocountry.api.dto.employee.EmployeeInfoDTO;
 import com.nocountry.api.dto.employee.SimpleEmployeeDTO;
-import com.nocountry.api.model.Employee;
 import com.nocountry.api.service.employee.EmployeeService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class EmployeeController {
                 page, size), HttpStatus.OK);
     }
 
-    @PostMapping("/employees")
+    @PostMapping("/admin/employees")
     @Transactional
     public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeInfoDTO employeeInfoDTO) {
         return new ResponseEntity<EmployeeDTO>(employeeService.create(employeeInfoDTO),HttpStatus.CREATED);
@@ -45,7 +46,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDTO> getEmployeeServices(
             @RequestParam("employee_id") Long employeeId,
             @RequestParam("business_id") Long businessId){
-        return new ResponseEntity<EmployeeDTO>(employeeService.getEmployeeServices(employeeId, businessId), HttpStatus.OK);
+        return new ResponseEntity<EmployeeDTO>(employeeService.getEmployeeServices(employeeId, businessId),
+                HttpStatus.OK);
     }
-
 }

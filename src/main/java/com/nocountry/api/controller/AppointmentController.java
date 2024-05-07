@@ -29,9 +29,11 @@ public class AppointmentController {
      * @return List of Appointment entities
      */
     @GetMapping("/appointments/{business_id}")
-    public ResponseEntity<List<AppointmentDTO>> listByBusinessIdAndYearAndMonth(@PathVariable("business_id") Long businessId,
-                                                                                @RequestParam("year") Integer year,
-                                                                                @RequestParam("month") Integer month) {
+    public ResponseEntity<List<AppointmentDTO>> listByBusinessIdAndYearAndMonth(
+            @PathVariable("business_id") Long businessId,
+            @RequestParam("year") Integer year,
+            @RequestParam("month") Integer month
+    ) {
         return new ResponseEntity<List<AppointmentDTO>>(employeesAppointmentsService
                 .listByServiceIdsAndYearAndMonth(businessId, year, month), HttpStatus.OK);
     }

@@ -20,10 +20,13 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
 public class ServicesServiceImpl implements ServicesService {
+
     @Autowired
     private IServiceRepository serviceRepository;
+
     @Autowired
     private IBusinessRepository businessRepository;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -46,11 +49,12 @@ public class ServicesServiceImpl implements ServicesService {
     public SimpleServiceDTO create(ServiceInfoDTO serviceInfoDTO) {
         Optional<Business> optionalBusiness = businessRepository.findById(serviceInfoDTO.getBusinessId());
         if (optionalBusiness.isEmpty()) {
-            throw new ResourceNotFoundException("Business with ID " + serviceInfoDTO.getBusinessId() + " does not exist");
+            throw new ResourceNotFoundException("Business with ID " + serviceInfoDTO.getBusinessId() +
+                    " does not exist");
         }
         Service service = new Service(optionalBusiness.get(), serviceInfoDTO.getName(), serviceInfoDTO.getDescription(),
                 serviceInfoDTO.getPrice(), serviceInfoDTO.getDurationMinutes());
-        return modelMapper.map(serviceRepository.save(service), SimpleServiceDTO.class);
+        return modelMapper.map(serviceRepository.save(service),SimpleServiceDTO.class);
     }
 
     @Override
@@ -62,8 +66,8 @@ public class ServicesServiceImpl implements ServicesService {
         return modelMapper.map(optionalService.get(), ServiceDTO.class);
     }
 
-    public List<ServiceDTO> getServicesByEmployeeId(Long id) {
-        try {
+    public List<ServiceDTO> getServicesByEmployeeId (Long id) {
+        try{
             List<Service> listServices = serviceRepository.findServiceByEmployeesId(id);
 
             if (!listServices.isEmpty()) {
